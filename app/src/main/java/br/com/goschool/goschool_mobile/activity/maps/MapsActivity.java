@@ -2,14 +2,11 @@ package br.com.goschool.goschool_mobile.activity.maps;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,7 +17,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -33,12 +29,10 @@ import java.util.List;
 
 import ModulesMaps.DirectionFinder;
 import ModulesMaps.DirectionFinderListener;
-import ModulesMaps.Route;
 
+import ModulesMaps.Route;
 import br.com.goschool.goschool_mobile.R;
-import br.com.goschool.goschool_mobile.activity.MenuLateralActivity;
-import br.com.goschool.goschool_mobile.activity.estudante.EstudanteActivity;
-import br.com.goschool.goschool_mobile.activity.motorista.MotoristaActivity;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, DirectionFinderListener {
 
@@ -50,6 +44,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ProgressDialog progressDialog;
+    private List<Marker> waypointsMarkers = new ArrayList<>();
+    private List<Student> students = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +56,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        btnFindPath = (Button) findViewById(R.id.btnFindPath);
-        etOrigin = (EditText) findViewById(R.id.etOrigin);
-        etDestination = (EditText) findViewById(R.id.etDestination);
+        btnFindPath = findViewById(R.id.btnFindPath);
+        etOrigin = findViewById(R.id.etOrigin);
+        etDestination = findViewById(R.id.etDestination);
 
-        etOrigin.setText("-16.669862, -49.240996");
-        etDestination.setText("-16.675942, -49.242902");
+        etOrigin.setText("-16.765557, -49.349650");
+        etDestination.setText("-16.671435, -49.236181");
 
         btnFindPath.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,51 +84,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         try {
-            new DirectionFinder(this, origin, destination).execute();
+            this.students = createStudentsArray();
+            new DirectionFinder(this, origin, destination, this.students).execute();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng hcmus = new LatLng(-16.671074, -49.238668);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcmus, 18));
+        LatLng latLng = new LatLng(-16.765557, -49.349650);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 9));
+
         originMarkers.add(mMap.addMarker(new MarkerOptions()
-                .title("Faculdade Senai Fatesg")
-                .position(hcmus)));
+                .title("Terminal Garavelo")
+                .position(latLng)));
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
         mMap.setMyLocationEnabled(true);
     }
 
 
     @Override
     public void onDirectionFinderStart() {
-        progressDialog = ProgressDialog.show(this, "Please wait.",
-                "Finding direction..!", true);
+        progressDialog = ProgressDialog.show(this, "Aguarde por favor.",
+                "Criando rota...", true);
 
         if (originMarkers != null) {
             for (Marker marker : originMarkers) {
@@ -153,6 +136,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private List<Student> createStudentsArray(){
+        List<Student> students = new ArrayList<>();
+
+        students.add(new Student(4, "Terminal Cruzeiro", new LatLng(-16.745183, -49.281941)));
+        students.add(new Student(1, "Terminal Isidória", new LatLng(-16.713944, -49.252724)));
+        students.add(new Student(2, "Terminal Bandeiras", new LatLng(-16.710327, -49.310519)));
+        students.add(new Student(3, "Terminal Praça A", new LatLng(-16.673473, -49.284325)));
+        students.add(new Student(5, "Terminal Padre Pelágio", new LatLng(-16.659399, -49.326482)));
+
+        return students;
+    }
+
     @Override
     public void onDirectionFinderSuccess(List<Route> routes) {
         progressDialog.dismiss();
@@ -161,18 +156,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         destinationMarkers = new ArrayList<>();
 
         for (Route route : routes) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 12));
             ((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
             ((TextView) findViewById(R.id.tvDistance)).setText(route.distance.text);
 
             originMarkers.add(mMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.start_blue))
                     .title(route.startAddress)
                     .position(route.startLocation)));
+
+
+
+            for (Student student: students) {
+                waypointsMarkers.add(mMap.addMarker(new MarkerOptions()
+                        .title(student.getEnrollment())
+                        .position(new LatLng(student.getLatitude() + ", " + student.getLongitude()))));
+            }
+
+
+//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.endLocation, 12));
             destinationMarkers.add(mMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
                     .title(route.endAddress)
                     .position(route.endLocation)));
+
 
             PolylineOptions polylineOptions = new PolylineOptions().
                     geodesic(true).
@@ -185,41 +190,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             polylinePaths.add(mMap.addPolyline(polylineOptions));
         }
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_lateral, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.cadastro_motorista) {
-            Intent intent = new Intent(this, MotoristaActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.cadastro_estudante) {
-            Intent intent = new Intent(this, EstudanteActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.localizacao) {
-            Intent intent = new Intent(this, MapsActivity.class);
-            startActivity(intent);
-
-        } else if (id == R.id.menu) {
-            Intent intent = new Intent(this, MenuLateralActivity.class);
-            startActivity(intent);
-
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 }
