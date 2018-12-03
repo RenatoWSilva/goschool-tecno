@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/cadastro_motorista"
+            android:icon="@drawable/ic_menu_motorista"
+            android:title="Cadastro Motorista" />
+        <item
+            android:id="@+id/cadastro_estudante"
+            android:icon="@drawable/ic_menu_aluno"
+            android:title="Cadastro Estudante" />
+        <item
+            android:id="@+id/localizacao"
+            android:icon="@drawable/ic_menu_localizacao"
+            android:title="Localizações" />
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Configurações" />
+    </group>
+
+    <item android:title="Informações">
+        <menu>
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_version"
+                android:title="Versão" />
+
+
+        </menu>
+    </item>
+
+</menu>

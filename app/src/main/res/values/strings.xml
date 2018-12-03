@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">GoSchool</string>
+    <string name="action_settings">Configurações</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_maps">Verificar Localizações</string>
+    <string name="title_activity_motorista">Motoristas Cadastrados</string>
+    <string name="title_activity_addmotorista">Cadastrar Motorista</string>
+    <string name="title_activity_editmotorista">Editar Motorista</string>
+    <string name="title_activity_estudante">Estudantes Cadastrados</string>
+    <string name="title_activity_addestudante">Cadastrar Estudante</string>
+    <string name="title_activity_ediestudante">Editar Estudante</string>
+    <string name="title_activity_menu_lateral">Home</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Santa Rosa Transporte</string>
+    <string name="nav_header_subtitle">Transporte Escolar</string>
+    <string name="nav_header_desc">Navigation header</string>
+</resources>
