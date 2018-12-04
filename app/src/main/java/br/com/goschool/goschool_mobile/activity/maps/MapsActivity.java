@@ -31,6 +31,7 @@ import ModulesMaps.DirectionFinder;
 import ModulesMaps.DirectionFinderListener;
 
 import ModulesMaps.Route;
+import ModulesMaps.Student;
 import br.com.goschool.goschool_mobile.R;
 
 
@@ -139,11 +140,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<Student> createStudentsArray(){
         List<Student> students = new ArrayList<>();
 
-        students.add(new Student(4, "Terminal Cruzeiro", new LatLng(-16.745183, -49.281941)));
-        students.add(new Student(1, "Terminal Isidória", new LatLng(-16.713944, -49.252724)));
-        students.add(new Student(2, "Terminal Bandeiras", new LatLng(-16.710327, -49.310519)));
-        students.add(new Student(3, "Terminal Praça A", new LatLng(-16.673473, -49.284325)));
-        students.add(new Student(5, "Terminal Padre Pelágio", new LatLng(-16.659399, -49.326482)));
+        students.add(new Student(4, "Terminal Cruzeiro", "-16.745183","-49.281941"));
+        students.add(new Student(1, "Terminal Isidória", "-16.713944","-49.252724"));
+        students.add(new Student(2, "Terminal Bandeiras", "-16.710327","-49.310519"));
+        students.add(new Student(3, "Terminal Praça A", "-16.673473","-49.284325"));
+        students.add(new Student(5, "Terminal Padre Pelágio", "-16.659399", "-49.326482"));
 
         return students;
     }
@@ -169,7 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for (Student student: students) {
                 waypointsMarkers.add(mMap.addMarker(new MarkerOptions()
                         .title(student.getEnrollment())
-                        .position(new LatLng(student.getLatitude() + ", " + student.getLongitude()))));
+                        .position(new LatLng(Double.parseDouble(student.getLatitude()), Double.parseDouble(student.getLongitude())))));
             }
 
 

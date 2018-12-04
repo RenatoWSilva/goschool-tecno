@@ -46,7 +46,7 @@ public class DirectionFinder {
             if (!waypoints.equals("")){
                 waypoints += "|";
             }
-            waypoints += "via:" + new LatLng(student.getLatitude() + ", " + student.getLongitude());
+            waypoints += "via:" + student.getLatitude() + "," + student.getLongitude();
         }
         return waypoints;
     }
