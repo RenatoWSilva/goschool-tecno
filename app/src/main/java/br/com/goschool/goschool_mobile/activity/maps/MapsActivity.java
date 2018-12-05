@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +34,12 @@ import ModulesMaps.DirectionFinderListener;
 import ModulesMaps.Route;
 import ModulesMaps.Student;
 import br.com.goschool.goschool_mobile.R;
+import br.com.goschool.goschool_mobile.api.APIStudent;
+import br.com.goschool.goschool_mobile.resource.StudentResource;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, DirectionFinderListener {
@@ -85,8 +92,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         try {
-            this.students = createStudentsArray();
-            new DirectionFinder(this, origin, destination, this.students).execute();
+            createStudentsArray();
+            new DirectionFinder(this, origin, destination, students).execute();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -137,16 +144,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private List<Student> createStudentsArray(){
-        List<Student> students = new ArrayList<>();
+    private void createStudentsArray(){
+        Retrofit retrofit = APIStudent.getStudent();
 
-        students.add(new Student(4, "Terminal Cruzeiro", "-16.745183","-49.281941"));
-        students.add(new Student(1, "Terminal Isidória", "-16.713944","-49.252724"));
-        students.add(new Student(2, "Terminal Bandeiras", "-16.710327","-49.310519"));
-        students.add(new Student(3, "Terminal Praça A", "-16.673473","-49.284325"));
-        students.add(new Student(5, "Terminal Padre Pelágio", "-16.659399", "-49.326482"));
+        StudentResource studentResource = retrofit.create(StudentResource.class);
 
-        return students;
+        Call<List<Student>> get = studentResource.get();
+
+        get.enqueue(new Callback<List<Student>>() {
+            @Override
+            public void onResponse(Call<List<Student>> call, Response<List<Student>> response) {
+                students = response.body();
+            }
+
+            @Override
+            public void onFailure(Call<List<Student>> call, Throwable t) {
+            }
+        });
+
+
+//        students.add(new Student(4, "Terminal Cruzeiro", "-16.745183","-49.281941"));
+//        students.add(new Student(1, "Terminal Isidória", "-16.713944","-49.252724"));
+//        students.add(new Student(2, "Terminal Bandeiras", "-16.710327","-49.310519"));
+//        students.add(new Student(3, "Terminal Praça A", "-16.673473","-49.284325"));
+//        students.add(new Student(5, "Terminal Padre Pelágio", "-16.659399", "-49.326482"));
     }
 
     @Override
@@ -165,16 +186,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .title(route.startAddress)
                     .position(route.startLocation)));
 
-
-
             for (Student student: students) {
                 waypointsMarkers.add(mMap.addMarker(new MarkerOptions()
                         .title(student.getEnrollment())
                         .position(new LatLng(Double.parseDouble(student.getLatitude()), Double.parseDouble(student.getLongitude())))));
             }
 
-
-//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.endLocation, 12));
             destinationMarkers.add(mMap.addMarker(new MarkerOptions()
                     .title(route.endAddress)
                     .position(route.endLocation)));
