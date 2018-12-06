@@ -26,6 +26,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import ModulesMaps.DirectionFinder;
@@ -71,32 +73,78 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         etOrigin.setText("-16.765557, -49.349650");
         etDestination.setText("-16.671435, -49.236181");
 
-        btnFindPath.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendRequest();
-            }
-        });
+        btnFindPath.setOnClickListener(v -> sendRequest());
     }
 
     private void sendRequest() {
         String origin = etOrigin.getText().toString();
         String destination = etDestination.getText().toString();
         if (origin.isEmpty()) {
-            Toast.makeText(this, "Please enter origin address!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Por favor, informe o endereço de origem!", Toast.LENGTH_SHORT).show();
             return;
         }
         if (destination.isEmpty()) {
-            Toast.makeText(this, "Please enter destination address!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Por favor, informe o endereço de destino!", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        createStudentsArray(origin, destination);
+
+//        try {
+//            new DirectionFinder(this, origin, destination, students).execute();
+//        }catch (UnsupportedEncodingException e){
+//            e.printStackTrace();
+//        }
+    }
+
+    private void createStudentsArray(String origin, String destination){
+        Retrofit retrofit = APIStudent.getStudent();
+
+        StudentResource studentResource = retrofit.create(StudentResource.class);
+
+        Call<List<Student>> get = studentResource.get();
+
+        get.enqueue(new Callback<List<Student>>() {
+            @Override
+            public void onResponse(Call<List<Student>> call, Response<List<Student>> response) {
+                students = response.body();
+                callGoogleMapsAPI(origin, destination);
+            }
+
+            @Override
+            public void onFailure(Call<List<Student>> call, Throwable t) {
+            }
+        });
+
+//        students.add(new Student(4, "Terminal Cruzeiro", "-16.745183","-49.281941"));
+//        students.add(new Student(1, "Terminal Isidória", "-16.713944","-49.252724"));
+//        students.add(new Student(2, "Terminal Bandeiras", "-16.710327","-49.310519"));
+//        students.add(new Student(3, "Terminal Praça A", "-16.673473","-49.284325"));
+//        students.add(new Student(5, "Terminal Padre Pelágio", "-16.659399", "-49.326482"));
+    }
+
+    // Para ordenar por nome
+    private void ordenaPorDistancia(List<Student> lista) {
+        Collections.sort(lista, new Comparator<Student>() {
+            @Override
+            public int compare(Student s1, Student s2) {
+                return s1.getDistance().compareTo(s2.getDistance());
+            }
+        });
+    }
+
+    private void callGoogleMapsAPI(String origin, String destination){
         try {
-            createStudentsArray();
             new DirectionFinder(this, origin, destination, students).execute();
-        } catch (UnsupportedEncodingException e) {
+        }catch (UnsupportedEncodingException e){
             e.printStackTrace();
         }
+    }
+
+    private void orderStudents(){
+        List<Student> students = new ArrayList<>();
+
+
     }
 
 
@@ -142,32 +190,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 polyline.remove();
             }
         }
-    }
-
-    private void createStudentsArray(){
-        Retrofit retrofit = APIStudent.getStudent();
-
-        StudentResource studentResource = retrofit.create(StudentResource.class);
-
-        Call<List<Student>> get = studentResource.get();
-
-        get.enqueue(new Callback<List<Student>>() {
-            @Override
-            public void onResponse(Call<List<Student>> call, Response<List<Student>> response) {
-                students = response.body();
-            }
-
-            @Override
-            public void onFailure(Call<List<Student>> call, Throwable t) {
-            }
-        });
-
-
-//        students.add(new Student(4, "Terminal Cruzeiro", "-16.745183","-49.281941"));
-//        students.add(new Student(1, "Terminal Isidória", "-16.713944","-49.252724"));
-//        students.add(new Student(2, "Terminal Bandeiras", "-16.710327","-49.310519"));
-//        students.add(new Student(3, "Terminal Praça A", "-16.673473","-49.284325"));
-//        students.add(new Student(5, "Terminal Padre Pelágio", "-16.659399", "-49.326482"));
     }
 
     @Override
